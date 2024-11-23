@@ -9,30 +9,45 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var Label1: UILabel!
+    @IBOutlet weak var Label2: UILabel!
+    @IBOutlet weak var Label3: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         DispatchQueue.global().async {
-            let result = self.performHeavyComputationSafely()
             
-            // UI update must happen on the main thread
-            DispatchQueue.main.asyncAfter(deadline: .now()+2) {
-                self.statusLabel.text = "Task completed = \(result)"
+            let str1: String? = self.simulateTask(with: "Task1", duration: 2)
+            if let taskTitle1 = str1 {
+                DispatchQueue.main.async {
+                    self.Label1.text = taskTitle1
+                }
+            }
+        }
+        
+        DispatchQueue.global().async {
+            let str2: String? = self.simulateTask(with: "Task2", duration: 3)
+            if let taskTitle2 = str2 {
+                DispatchQueue.main.async {
+                    self.Label2.text = taskTitle2
+                }
+            }
+        }
+        
+        DispatchQueue.global().async {
+            let str3:String? = self.simulateTask(with: "Task3", duration: 1)
+            if let taskTitle3 = str3 {
+                DispatchQueue.main.async {
+                    self.Label3.text = taskTitle3
+                }
             }
         }
     }
     
-    private func performHeavyComputationSafely() -> Int {
-        // Perform heavy computation (no direct UI or main-thread dependencies)
-        Thread.sleep(forTimeInterval: 2) // Simulate time-consuming task
-        
-        var sum = 0
-        for i in 1...10_000_000 {
-            sum += i
-        }
-        return sum
+    private func simulateTask(with Title:String, duration:Int) -> String {
+        sleep(UInt32(duration))
+        return "\(Title) completed"
     }
     
 }
