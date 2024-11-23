@@ -13,27 +13,39 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.statusLabel.text = "fetching data"
         
-        DispatchQueue.global().async {
-            let result = self.performHeavyComputationSafely()
+        fetchAPIdata()
+    }
+    
+    private func fetchAPIdata() {
+        
+        let url = URL(string: "https://jsonplaceholder.typicode.com/posts/1")!
+
+        let task = URLSession.shared.dataTask(with: url) {data, response, error in
             
-            // UI update must happen on the main thread
-            DispatchQueue.main.asyncAfter(deadline: .now()+2) {
-                self.statusLabel.text = "Task completed = \(result)"
+            if let error = error {
+                print("failed with error \(error)")
+                DispatchQueue.main.async {
+                    self.statusLabel.text = "failed to load data with error = \(error.localizedDescription)"
+                }
+                return
+            }
+            
+            if let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String:Any], let title = json["title"] as? String {
+                
+                DispatchQueue.main.async {
+                    self.statusLabel.text = "title = \(title)"
+                }
+                
+            }
+            else {
+                DispatchQueue.main.async {
+                    self.statusLabel.text = "invalid data"
+                }
             }
         }
+        task.resume()
     }
-    
-    private func performHeavyComputationSafely() -> Int {
-        // Perform heavy computation (no direct UI or main-thread dependencies)
-        Thread.sleep(forTimeInterval: 2) // Simulate time-consuming task
-        
-        var sum = 0
-        for i in 1...10_000_000 {
-            sum += i
-        }
-        return sum
-    }
-    
 }
 
