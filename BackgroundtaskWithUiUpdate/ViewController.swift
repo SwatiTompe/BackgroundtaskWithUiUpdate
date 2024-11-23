@@ -18,7 +18,7 @@ class ViewController: UIViewController {
             let result = self.performHeavyComputationSafely()
             
             // UI update must happen on the main thread
-            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now()+2) {
                 self.statusLabel.text = "Task completed = \(result)"
             }
         }
