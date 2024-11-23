@@ -9,43 +9,35 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var imageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.statusLabel.text = "fetching data"
         
-        fetchAPIdata()
-    }
-    
-    private func fetchAPIdata() {
+       // DownloadAndprocessImage()
         
-        let url = URL(string: "https://jsonplaceholder.typicode.com/posts/1")!
+        DispatchQueue.global().async {
+            
+            let image: UIImage? = self.DownloadAndprocessImage()
 
-        let task = URLSession.shared.dataTask(with: url) {data, response, error in
-            
-            if let error = error {
-                print("failed with error \(error)")
-                DispatchQueue.main.async {
-                    self.statusLabel.text = "failed to load data with error = \(error.localizedDescription)"
-                }
-                return
-            }
-            
-            if let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String:Any], let title = json["title"] as? String {
+            if let image = image {
                 
                 DispatchQueue.main.async {
-                    self.statusLabel.text = "title = \(title)"
-                }
-                
-            }
-            else {
-                DispatchQueue.main.async {
-                    self.statusLabel.text = "invalid data"
+                    self.imageView.image = image
                 }
             }
         }
-        task.resume()
+    }
+    
+    private func DownloadAndprocessImage() -> UIImage {
+        
+        let url = URL(string: "https://via.placeholder.com/150")!
+        
+        if let data = try? Data(contentsOf: url) {
+            return UIImage(data: data)!
+        }
+        return UIImage()
+        
     }
 }
 
